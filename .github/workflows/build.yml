@@ -1,0 +1,26 @@
+name: Build QMK Firmware
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/qmk/qmk_cli
+    steps:
+      - name: Git safe directory 예외처리
+        run: git config --global --add safe.directory '*'
+
+      - name: 리포지토리 체크아웃 (서브모듈 포함)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: crkbd rev1 default 키맵 빌드
+        run: qmk compile -kb crkbd/rev1 -km default
+
+      - name: 결과물(.hex) 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: crkbd_rev1_default_hex
+          path: '*.hex'
